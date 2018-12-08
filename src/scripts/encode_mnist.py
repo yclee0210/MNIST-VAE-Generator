@@ -14,7 +14,7 @@ from scripts.train_vae import train as train_vae
 import matplotlib.pyplot as plt
 
 DEFAULT_CKPT = str(CHECKPOINT_DIR / DEFAULT_VAE_CONFIG / MODEL_OUTPUT_FILENAME)
-DEFAULT_FIGURE = str(RESULT_DIR / DEFAULT_VAE_CONFIG / 'encode_mnist.png')
+DEFAULT_FIGURE_DIR = RESULT_DIR / DEFAULT_VAE_CONFIG
 
 
 def parse_args():
@@ -30,14 +30,18 @@ def encode(sess, model, xs):
     return model.encode(sess, xs)
 
 
-def plot_data(coord, color, save_file=None):
+def plot_data(coord, color, config=DEFAULT_VAE_CONFIG, save_plot=False):
     plt.figure(figsize=(8, 6))
     plt.scatter(coord[:, 0], coord[:, 1], c=np.argmax(color, 1))
     plt.colorbar()
     plt.grid()
 
-    if save_file is not None:
-        plt.savefig(DEFAULT_FIGURE)
+    if save_plot:
+        results_dir = RESULT_DIR / config
+        if not results_dir.exists():
+            results_dir.mkdir()
+        filepath = '%s/%s' % (str(results_dir), '/encode_mnist.png')
+        plt.savefig(filepath)
     else:
         plt.show()
 
@@ -65,4 +69,4 @@ if __name__ == '__main__':
         z_mean, labels = encode(session, vae, dataset)
 
         if args.plot:
-            plot_data(z_mean, labels, args.save_plot)
+            plot_data(z_mean, labels, config=args.config, save_plot=args.save_plot)
