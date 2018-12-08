@@ -18,7 +18,7 @@ DEFAULT_VAE_CONFIG = 'mnist_vae'
 
 
 def build_checkpoint_path(config, filename):
-    path = CHECKPOINT_DIR / config / filename
+    path = CHECKPOINT_DIR / config
     if not path.exists():
         path.mkdir()
-    return str(path)
+    return '%s/%s' % (str(path), filename)
