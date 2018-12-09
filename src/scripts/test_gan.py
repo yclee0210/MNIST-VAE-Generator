@@ -29,7 +29,7 @@ def generate_plot(sess, model):
 
 if __name__ == "__main__":
     vae_checkpoint = str(CHECKPOINT_DIR / DEFAULT_VAE_CONFIG / MODEL_OUTPUT_FILENAME)
-    gan_checkpoint = str(CHECKPOINT_DIR / DEFAULT_GAN_CONFIG / 'model.ckpt-110')
+    gan_checkpoint = str(CHECKPOINT_DIR / DEFAULT_GAN_CONFIG / 'model.ckpt')
     vae_architecture = vae_config[DEFAULT_VAE_CONFIG]
     gan_architecture = gan_config[DEFAULT_GAN_CONFIG]
 
