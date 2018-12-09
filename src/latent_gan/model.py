@@ -15,6 +15,8 @@ class LatentGan(object):
         # Generator takes a random input noise
         self.x = tf.placeholder(tf.float32, [None, self.architecture['n_input']])
         self.y = tf.placeholder(tf.float32, [None, 2])
+        self.label = tf.placeholder(tf.float32, [None, self.architecture['n_label']])
+        self.one_hots = np.eye(self.architecture['n_label'])
 
         self._create_network()
         self._create_optimizer()
@@ -22,74 +24,67 @@ class LatentGan(object):
         self.init = tf.global_variables_initializer()
 
     def _create_network(self):
-        self.generator = Generator(self.x, self.architecture['n_input'],
-                                   self.architecture['n_hidden_gen_layer_1'],
+        self.generator = Generator(self.x, self.label, self.architecture['n_input'],
+                                   self.architecture['n_label'],
+                                   self.architecture['n_hidden_gen_input_layer_1'],
+                                   self.architecture['n_hidden_gen_label_layer_1'],
                                    self.architecture['n_hidden_gen_layer_2'],
                                    self.architecture['n_z'], self.transfer_fn)
         self.z = self.generator.output
-        self.discriminator = Discriminator(self.z, self.architecture['n_z'],
-                                           self.architecture['n_hidden_dis_layer_1'],
+        self.discriminator = Discriminator(self.z, self.y, self.label, self.architecture['n_z'],
+                                           self.architecture['n_label'],
+                                           self.architecture['n_hidden_dis_input_layer_1'],
+                                           self.architecture['n_hidden_dis_label_layer_1'],
                                            self.architecture['n_hidden_dis_layer_2'],
-                                           tf.nn.softplus)
+                                           self.transfer_fn)
         self.prediction = self.discriminator.output
 
     def _create_optimizer(self):
         self.loss = tf.nn.softmax_cross_entropy_with_logits_v2(labels=self.y,
                                                                logits=self.prediction)
         self.optimizer = tf.train.AdamOptimizer(learning_rate=self.learning_rate).minimize(
-            self.loss)
+            self.loss, var_list=self.generator.variables)
 
     def _get_saver(self):
         return tf.train.Saver()
 
-    def train_batch(self, sess, batch):
+    def train_batch(self, sess, batch, label):
         # Generate fake inputs
         noise = np.random.normal(size=(self.batch_size, self.architecture['n_input']))
-        fake = sess.run(self.z, feed_dict={self.x: noise})
+        fake_label = np.zeros((noise.shape[0], self.architecture['n_label']))
+        for i in range(len(label)):
+            fake_label[i, :] = self.one_hots[
+                np.random.randint(low=0, high=self.architecture['n_label'])]
+        fake = sess.run(self.z, feed_dict={self.x: noise, self.label: fake_label})
 
         half = int(self.batch_size / 2)
-        z = np.concatenate((batch[:half, :], fake[:half, :]))
         y = np.ones([self.batch_size, 2])
         y[half:, 0] = 0
         y[:half, 1] = 0
 
+        z = np.concatenate((batch[:half, :], fake[:half, :]))
+        labels = np.concatenate((label[:half, :], np.zeros([half, label.shape[1]])))
         _, dis_cost1 = sess.run((self.discriminator.optimizer, self.discriminator.loss),
-                                feed_dict={self.x: noise, self.discriminator.z_direct: z,
-                                           self.discriminator.y: y})
-        z = np.concatenate((batch[half:, :], fake[half:, :]))
-        _, dis_cost2 = sess.run((self.discriminator.optimizer, self.discriminator.loss),
-                                feed_dict={self.x: noise, self.discriminator.z_direct: z,
-                                           self.discriminator.y: y})
+                                feed_dict={self.discriminator.z_direct: z,
+                                           self.label: labels, self.y: y})
 
-        y = np.ones([self.batch_size, 2])
-        y[:, 0] = 0
+        z = np.concatenate((batch[half:, :], fake[half:, :]))
+        labels = np.concatenate((label[half:, :], np.zeros([half, label.shape[1]])))
+        _, dis_cost2 = sess.run((self.discriminator.optimizer, self.discriminator.loss),
+                                feed_dict={self.discriminator.z_direct: z,
+                                           self.label: labels, self.y: y})
+
         x = np.random.normal(size=(self.batch_size, self.architecture['n_input']))
+        labels = np.zeros((noise.shape[0], self.architecture['n_label']))
+        for i in range(len(label)):
+            labels[i, :] = self.one_hots[
+                np.random.randint(low=0, high=self.architecture['n_label'])]
+        y = np.ones([self.batch_size, 2])
+        y[:, 1] = 0
         _, adv_cost = sess.run((self.optimizer, self.loss),
-                               feed_dict={self.x: x, self.y: y})
+                               feed_dict={self.x: x, self.label: labels, self.y: y})
 
         return np.concatenate((dis_cost1, dis_cost2)), adv_cost
-
-    def train(self, sess, real, epochs=10, display_step=5, checkpoint_file=None):
-        sess.run(self.init)
-
-        n_real = real.shape[0]
-        num_batches = int(n_real / self.batch_size)
-
-        # Save option
-        saver = None
-        if checkpoint_file is not None:
-            saver = self._get_saver()
-
-        for epoch in range(epochs):
-            batch_xs = real[np.random.randint(0, real.sahpe[0], size=self.batch_size), :, :]
-            for i in range(num_batches):
-                dis_cost, adv_cost = self.train_batch(sess, batch_xs)
-
-                if (epoch + 1) % display_step == 0:
-                    print("Epoch %04d: discriminator cost=%.9f, GAN cost=%.9f" % (
-                        epoch + 1, dis_cost, adv_cost))
-        if checkpoint_file is not None:
-            saver.save(sess, checkpoint_file)
 
     def generate(self):
         pass
@@ -103,57 +98,92 @@ class LatentGan(object):
 
 
 class Generator(object):
-    def __init__(self, x, n_input, n_hidden_layer_1, n_hidden_layer_2, n_z, transfer_fn):
+    def __init__(self, x, label, n_input, n_label, n_hidden_input_layer_1, n_hidden_label_layer_1,
+                 n_hidden_layer_2, n_z, transfer_fn):
         self.x = x
+        self.label = label
         self.weights = {
-            'h1': tf.get_variable('gen_weights_h1', shape=(n_input, n_hidden_layer_1),
+            'input1': tf.get_variable('gen_weights_i1', shape=(n_input, n_hidden_input_layer_1),
+                                      dtype=tf.float32),
+            'label1': tf.get_variable('gen_weights_l1', shape=(n_label, n_hidden_label_layer_1),
+                                      dtype=tf.float32),
+            'h2': tf.get_variable('gen_weights_h2',
+                                  shape=(n_hidden_input_layer_1 + n_hidden_label_layer_1,
+                                         n_hidden_layer_2),
                                   dtype=tf.float32),
-            'h2': tf.get_variable('gen_weights_h2', shape=(n_hidden_layer_1, n_hidden_layer_2),
-                                  dtype=tf.float32),
-            'out': tf.get_variable('gen_weights_out',
-                                   shape=(n_hidden_layer_2, n_z), dtype=tf.float32)}
+            'out': tf.get_variable('gen_weights_out', shape=(n_hidden_layer_2, n_z),
+                                   dtype=tf.float32)}
         self.biases = {
-            'b1': tf.Variable(tf.zeros([n_hidden_layer_1], dtype=tf.float32)),
+            'bi1': tf.Variable(tf.zeros([n_hidden_input_layer_1], dtype=tf.float32)),
+            'bl1': tf.Variable(tf.zeros([n_hidden_label_layer_1], dtype=tf.float32)),
             'b2': tf.Variable(tf.zeros([n_hidden_layer_2], dtype=tf.float32)),
             'out': tf.Variable(tf.zeros([n_z], dtype=tf.float32))}
 
         # 2 Softplus layers
-        layer_1 = transfer_fn(tf.add(tf.matmul(self.x, self.weights['h1']), self.biases['b1']))
-        layer_2 = transfer_fn(tf.add(tf.matmul(layer_1, self.weights['h2']), self.biases['b2']))
+        input_layer_1 = transfer_fn(
+            tf.add(tf.matmul(self.x, self.weights['input1']), self.biases['bi1']))
+        label_layer_1 = transfer_fn(
+            tf.add(tf.matmul(self.label, self.weights['label1']), self.biases['bl1']))
+        concat = tf.concat([input_layer_1, label_layer_1], 1)
+        layer_2 = transfer_fn(tf.add(tf.matmul(concat, self.weights['h2']), self.biases['b2']))
 
+        self.output = tf.add(tf.matmul(tf.nn.sigmoid(layer_2), self.weights['out']),
+                             self.biases['out'])
+        self.variables = [var for key, var in self.weights.items()] + [var for key, var in
+                                                                       self.biases.items()]
+        # z_mean = tf.add(tf.matmul(layer_2, self.weights['out_mean']), self.biases['out_mean'])
+        # z_log_sigma_sq = tf.add(tf.matmul(layer_2, self.weights['out_log_sigma']),
+        #                         self.biases['out_log_sigma'])
         # Regularize?
-        self.output = tf.add(tf.matmul(tf.nn.sigmoid(layer_2), self.weights['out']), self.biases['out'])
+        # eps = tf.random_normal((100, n_z), 0, 1, dtype=tf.float32)
+        # self.output = tf.add(z_mean, tf.multiply(tf.sqrt(tf.exp(z_log_sigma_sq)), eps))
 
 
 class Discriminator(object):
-    def __init__(self, z, n_z, n_hidden_layer_1, n_hidden_layer_2, transfer_fn):
+    def __init__(self, z, y, label, n_z, n_label, n_hidden_input_layer_1, n_hidden_label_layer_1,
+                 n_hidden_layer_2, transfer_fn):
         self.z = z
-        self.y = tf.placeholder(tf.float32, [None, 2])
+        self.label = label
+        self.y = y
         self.z_direct = tf.placeholder(tf.float32, [None, n_z])
         self.weights = {
-            'h1': tf.get_variable('dis_weights_h1', shape=(n_z, n_hidden_layer_1),
-                                  dtype=tf.float32),
-            'h2': tf.get_variable('dis_weights_h2', shape=(n_hidden_layer_1, n_hidden_layer_2),
+            'input1': tf.get_variable('dis_weights_i1', shape=(n_z, n_hidden_input_layer_1),
+                                      dtype=tf.float32),
+            'label1': tf.get_variable('dis_weights_l1', shape=(n_label, n_hidden_label_layer_1),
+                                      dtype=tf.float32),
+            'h2': tf.get_variable('dis_weights_h2',
+                                  shape=(n_hidden_input_layer_1 + n_hidden_label_layer_1,
+                                         n_hidden_layer_2),
                                   dtype=tf.float32),
             'out': tf.get_variable('dis_weights_out',
                                    shape=(n_hidden_layer_2, 2), dtype=tf.float32),
         }
         self.biases = {
-            'b1': tf.Variable(tf.zeros([n_hidden_layer_1], dtype=tf.float32)),
+            'bi1': tf.Variable(tf.zeros([n_hidden_input_layer_1], dtype=tf.float32)),
+            'bl1': tf.Variable(tf.zeros([n_hidden_label_layer_1], dtype=tf.float32)),
             'b2': tf.Variable(tf.zeros([n_hidden_layer_2], dtype=tf.float32)),
             'out': tf.Variable(tf.zeros([2], dtype=tf.float32))}
 
-        layer_1 = transfer_fn(tf.add(tf.matmul(self.z, self.weights['h1']), self.biases['b1']))
-        layer_2 = transfer_fn(tf.add(tf.matmul(layer_1, self.weights['h2']), self.biases['b2']))
+        input_layer_1 = transfer_fn(
+            tf.add(tf.matmul(self.z, self.weights['input1']), self.biases['bi1']))
+        label_layer_1 = transfer_fn(
+            tf.add(tf.matmul(self.label, self.weights['label1']), self.biases['bl1']))
+        concat = tf.concat([input_layer_1, label_layer_1], 1)
+        layer_2 = transfer_fn(tf.add(tf.matmul(concat, self.weights['h2']), self.biases['b2']))
 
-        dis_layer_1 = transfer_fn(
-            tf.add(tf.matmul(self.z_direct, self.weights['h1']), self.biases['b1']))
+        dis_input_layer_1 = transfer_fn(
+            tf.add(tf.matmul(self.z_direct, self.weights['input1']), self.biases['bi1']))
+        concat2 = tf.concat([dis_input_layer_1, label_layer_1], 1)
         dis_layer_2 = transfer_fn(
-            tf.add(tf.matmul(dis_layer_1, self.weights['h2']), self.biases['b2']))
+            tf.add(tf.matmul(concat2, self.weights['h2']), self.biases['b2']))
 
         # logit output
         self.output = tf.add(tf.matmul(layer_2, self.weights['out']), self.biases['out'])
         self.output_direct = tf.add(tf.matmul(dis_layer_2, self.weights['out']), self.biases['out'])
 
-        self.loss = tf.nn.softmax_cross_entropy_with_logits_v2(labels=self.y, logits=self.output)
-        self.optimizer = tf.train.AdamOptimizer(learning_rate=0.001).minimize(self.loss)
+        self.variables = [var for key, var in self.weights.items()] + [var for key, var in
+                                                                       self.biases.items()]
+        self.loss = tf.nn.softmax_cross_entropy_with_logits_v2(labels=self.y,
+                                                               logits=self.output_direct)
+        self.optimizer = tf.train.AdamOptimizer(learning_rate=0.001).minimize(self.loss,
+                                                                              var_list=self.variables)
