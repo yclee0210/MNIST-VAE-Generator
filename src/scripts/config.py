@@ -15,6 +15,7 @@ MODEL_OUTPUT_FILENAME = 'model.ckpt'
 DEFAULT_EPOCHS = 75
 
 DEFAULT_VAE_CONFIG = 'mnist_vae'
+DEFAULT_GAN_CONFIG = 'latent_gan'
 
 
 def build_checkpoint_path(config, filename):

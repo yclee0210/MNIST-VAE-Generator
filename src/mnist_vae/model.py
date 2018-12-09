@@ -112,9 +112,12 @@ class Vae(object):
                     saver.save(sess, '%s-%d' % (checkpoint_file, epoch + 1))
         saver.save(sess, checkpoint_file)
 
-    def encode(self, sess, dataset):
+    def encode(self, sess, dataset, mean_only=True):
         batch, labels = dataset.test.next_batch(5000)
-        return sess.run(self.z_mean, feed_dict={self.x: batch}), labels
+        if mean_only:
+            return sess.run(self.z_mean,  feed_dict={self.x: batch}), labels
+        else:
+            return sess.run(self.z,  feed_dict={self.x: batch}), labels
 
     def decode(self, sess, z_mean):
         return sess.run(self.x_reconstr_mean, feed_dict={self.z: z_mean})
@@ -122,6 +125,9 @@ class Vae(object):
     def generate(self, sess):
         z_mean = np.random.normal(size=self.architecture['n_z'])
         return self.decode(sess, z_mean)
+
+    def run(self, sess, inputs):
+        return sess.run(self.x_reconstr_mean, feed_dict={self.x: inputs})
 
     def restore(self, sess, checkpoint):
         saver = self._get_saver()

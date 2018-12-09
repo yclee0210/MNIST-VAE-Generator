@@ -26,8 +26,8 @@ def parse_args():
     return parser.parse_args()
 
 
-def encode(sess, model, xs):
-    return model.encode(sess, xs)
+def encode(sess, model, xs, mean_only=False):
+    return model.encode(sess, xs, mean_only)
 
 
 def plot_data(coord, color, config=DEFAULT_VAE_CONFIG, save_plot=False):
