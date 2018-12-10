@@ -74,8 +74,14 @@ if __name__ == '__main__':
         canvas = np.empty((28 * 10, 28 * 10))
         for i in range(10):
             stat = stats[i]
-            z = np.array([[mean + std * np.random.normal(0, 0.5) for mean, std in stat] for i in range(100)])
+            # z = np.array([[mean for mean, std in stat] for i in range(100)])
+            # z = np.array([[mean + std * np.random.normal(0, 1) for mean, std in stat] for i in range(100)])
+            # z = np.array([[mean + std * np.random.normal(0, 0.1) for mean, std in stat] for i in range(100)])
+            z = np.array([np.mean(np.array([[mean + std * np.random.normal(0, 0.5) for mean, std in stat] for i in range(3)]), 0) for i in range(100)])
+            print(z.shape)
+
             out = session.run(vae.x_reconstr_mean, feed_dict={vae.z: z})
+            print(out.shape)
             for j in range(10):
                 pic = out[j]
                 canvas[(10 - i - 1) * 28:(10 - i) * 28, j * 28:(j + 1) * 28] = out[j].reshape(28, 28)
