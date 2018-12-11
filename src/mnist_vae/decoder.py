@@ -9,6 +9,7 @@ import tensorflow as tf
 class Decoder(object):
     def __init__(self, z, n_input, n_hidden_layer_1, n_hidden_layer_2, n_z,
                  transfer_fn):
+        self.transfer_fn = transfer_fn
         self.z = z
         self.weights = {
             'h1': tf.get_variable('decoder_weights_h1', shape=(n_z, n_hidden_layer_1),
@@ -27,6 +28,14 @@ class Decoder(object):
 
         layer_1 = transfer_fn(tf.add(tf.matmul(self.z, self.weights['h1']), self.biases['b1']))
         layer_2 = transfer_fn(tf.add(tf.matmul(layer_1, self.weights['h2']), self.biases['b2']))
+
+        self.output = tf.nn.sigmoid(
+            tf.add(tf.matmul(layer_2, self.weights['out_mean']), self.biases['out_mean']))
+
+    def reconfigure(self, z):
+        self.z = z
+        layer_1 = self.transfer_fn(tf.add(tf.matmul(self.z, self.weights['h1']), self.biases['b1']))
+        layer_2 = self.transfer_fn(tf.add(tf.matmul(layer_1, self.weights['h2']), self.biases['b2']))
 
         self.output = tf.nn.sigmoid(
             tf.add(tf.matmul(layer_2, self.weights['out_mean']), self.biases['out_mean']))

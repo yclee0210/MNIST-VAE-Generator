@@ -1,2 +1,6 @@
 model_checkpoint_path: "/Users/yclee/Documents/UW-F18/CS760/music-gan/src/checkpoints/mnist_vae/model.ckpt"
+all_model_checkpoint_paths: "/Users/yclee/Documents/UW-F18/CS760/music-gan/src/checkpoints/mnist_vae/model.ckpt-60"
+all_model_checkpoint_paths: "/Users/yclee/Documents/UW-F18/CS760/music-gan/src/checkpoints/mnist_vae/model.ckpt-65"
+all_model_checkpoint_paths: "/Users/yclee/Documents/UW-F18/CS760/music-gan/src/checkpoints/mnist_vae/model.ckpt-70"
+all_model_checkpoint_paths: "/Users/yclee/Documents/UW-F18/CS760/music-gan/src/checkpoints/mnist_vae/model.ckpt-75"
 all_model_checkpoint_paths: "/Users/yclee/Documents/UW-F18/CS760/music-gan/src/checkpoints/mnist_vae/model.ckpt"

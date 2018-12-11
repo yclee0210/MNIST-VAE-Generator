@@ -30,9 +30,9 @@ if __name__ == "__main__":
             avg_dis_cost = 0.
             avg_adv_cost = 0.
             for i in range(int(n_samples / vae.batch_size)):
-                data, _ = dataset.train.next_batch(vae.batch_size)
+                data, labels = dataset.train.next_batch(vae.batch_size)
                 encoded = session.run(vae.z, feed_dict={vae.x: data})
-                dis_cost, adv_cost = gan.train_batch(session, encoded)
+                dis_cost, adv_cost = gan.train_batch(session, encoded, labels)
                 avg_dis_cost += np.mean(dis_cost) / n_samples * vae.batch_size
                 avg_adv_cost += np.mean(adv_cost) / n_samples * vae.batch_size
             if epochs % 10 == 0:

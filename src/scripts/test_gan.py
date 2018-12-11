@@ -29,7 +29,7 @@ def generate_plot(sess, model):
 
 if __name__ == "__main__":
     vae_checkpoint = str(CHECKPOINT_DIR / DEFAULT_VAE_CONFIG / MODEL_OUTPUT_FILENAME)
-    gan_checkpoint = str(CHECKPOINT_DIR / DEFAULT_GAN_CONFIG / 'model.ckpt')
+    gan_checkpoint = str(CHECKPOINT_DIR / DEFAULT_GAN_CONFIG / 'model.ckpt-60')
     vae_architecture = vae_config[DEFAULT_VAE_CONFIG]
     gan_architecture = gan_config[DEFAULT_GAN_CONFIG]
 
@@ -40,13 +40,16 @@ if __name__ == "__main__":
         saver = tf.train.Saver()
         saver.restore(session, gan_checkpoint)
 
+        one_hot = np.eye(gan_architecture['n_label'])
         canvas = np.empty((28 * 20, 28 * 20))
         for i in range(20):
             for j in range(20):
+                label = np.zeros((100, 10))
+                label[:, j % 10] = 1
                 noise = np.random.normal(size=(gan.batch_size, gan.architecture['n_input']))
-                output = session.run(gan.z, feed_dict={gan.x: noise})
-                img = vae.decode(session, output)
-                canvas[(20 - i - 1) * 28:(20 - i) * 28, j * 28: (j+1) * 28] = img[0].reshape(28, 28)
+                output = session.run(gan.z, feed_dict={gan.x: noise, gan.label: label})
+                img = np.mean(vae.decode(session, output), 0)
+                canvas[(20 - i - 1) * 28:(20 - i) * 28, j * 28: (j+1) * 28] = img.reshape(28, 28)
 
         plt.figure(figsize=(8, 10))
         plt.imshow(canvas, origin="upper", cmap="gray")
