@@ -42,10 +42,10 @@
 
 \author{
   Ernesto Vargas Aguilar \\
-  \texttt{email} \\
+  \texttt{vargasaguila@wisc.edu} \\
    \And
    Cong (Frank) Gu \\
-   \texttt{email} \\
+   \texttt{cgu38@wisc.edu} \\
    \And
    Yunchan Clemence Lee \\
    \texttt{ylee642@wisc.edu} \\
@@ -79,7 +79,7 @@ painting and visual art, music and poetry. \par
 
 A variational autoencoder (VAE) consists of two networks, encoder and decoder. The encoder
 takes in samples in the domain of interest, and outputs a distribution in a lower dimensional
-latent space. The decoder samples from this distribution and decodes the latent representation
+latent space (Kingma, 2014). The decoder samples from this distribution and decodes the latent representation
 back into data space. Specifically, the latent representation z is a sample from the Gaussian
 probability density defined by the output of the encoder $q_\theta(\mathbf{z}|\mathbf{x})$, and
 the final output of the VAE is a reconstruction $p_\theta(\mathbf{x}|\mathbf{z})$ of the original input 
