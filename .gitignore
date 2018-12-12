@@ -1,7 +1,9 @@
 /**/*.pyc
 .idea/*
 src/MNIST_data/
-src/checkpoints/mnist_vae/model.ckpt-*
-src/checkpoints/mnist_vae_2d/model.ckpt-*
-src/checkpoints/latent_gan/model.ckpt-*
+src/checkpoints/vae/*/model.ckpt-*
+src/checkpoints/mmd/*/model.ckpt-*
+src/checkpoints/classifier/*/model.ckpt-*
 !src/checkpoitns/latent_gan/model.ckpt-110.*
+tmp/
+archive/

@@ -1,0 +1,23 @@
+\BOOKMARK [1][-]{section.1}{Introduction}{}% 1
+\BOOKMARK [1][-]{section.2}{Background}{}% 2
+\BOOKMARK [2][-]{subsection.2.1}{Variational Autoencoders}{section.2}% 3
+\BOOKMARK [1][-]{section.3}{Proposed Method}{}% 4
+\BOOKMARK [2][-]{subsection.3.1}{Motivation}{section.3}% 5
+\BOOKMARK [2][-]{subsection.3.2}{Overview}{section.3}% 6
+\BOOKMARK [2][-]{subsection.3.3}{VAE Training}{section.3}% 7
+\BOOKMARK [2][-]{subsection.3.4}{Classifier}{section.3}% 8
+\BOOKMARK [2][-]{subsection.3.5}{Generator}{section.3}% 9
+\BOOKMARK [3][-]{subsubsection.3.5.1}{Simple}{subsection.3.5}% 10
+\BOOKMARK [3][-]{subsubsection.3.5.2}{Medium1}{subsection.3.5}% 11
+\BOOKMARK [3][-]{subsubsection.3.5.3}{Medium2}{subsection.3.5}% 12
+\BOOKMARK [1][-]{section.4}{Experiments}{}% 13
+\BOOKMARK [2][-]{subsection.4.1}{Dataset}{section.4}% 14
+\BOOKMARK [2][-]{subsection.4.2}{Training Details}{section.4}% 15
+\BOOKMARK [2][-]{subsection.4.3}{Results}{section.4}% 16
+\BOOKMARK [3][-]{subsubsection.4.3.1}{Cosine Similarity vs Classification Accuracy}{subsection.4.3}% 17
+\BOOKMARK [3][-]{subsubsection.4.3.2}{Objective function score comparison and sample generations}{subsection.4.3}% 18
+\BOOKMARK [1][-]{section.5}{Related Works}{}% 19
+\BOOKMARK [2][-]{subsection.5.1}{Attribute2Image}{section.5}% 20
+\BOOKMARK [2][-]{subsection.5.2}{MusicVAE}{section.5}% 21
+\BOOKMARK [2][-]{subsection.5.3}{Generative Adversarial Networks}{section.5}% 22
+\BOOKMARK [1][-]{section.6}{Conclusion}{}% 23

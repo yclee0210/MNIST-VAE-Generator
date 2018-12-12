@@ -1,22 +1,25 @@
 import argparse
 import tensorflow as tf
 from tensorflow.examples.tutorials.mnist import input_data
-import numpy as np
 
-from mnist_vae.model import Vae
-from mnist_vae.config import config
+from vae.vae import Vae
+from vae.mmd_vae import MmdVae
 
-from scripts.config import *
+from config.paths import *
 
 import matplotlib.pyplot as plt
 
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--config', dest='config', default=DEFAULT_VAE_CONFIG, type=str)
-    parser.add_argument('--vae-checkpoint', dest='vae_checkpoint_file',
-                        default=MODEL_OUTPUT_FILENAME, type=str)
-    parser.add_argument('--save-plot', dest='save_plot', action='store_true')
+    parser.add_argument('--data_dir', dest='data_dir', default=str(DATA_ROOT), type=str)
+    parser.add_argument('--vae_model', dest='vae_model', default='vae', type=str)
+    parser.add_argument('--latent_dim', dest='latent_dim', default=20, type=int)
+    parser.add_argument('--batch_size', dest='batch_size', default=100, type=int)
+    parser.add_argument('--display_step', dest='display_step', default=10, type=int)
+    parser.add_argument('--hidden_size', dest='hidden_size', default=500, type=int)
+    parser.add_argument('--layers', dest='layers', default=2, type=int)
+    parser.add_argument('--ckpt_num', dest='ckpt_num', type=int)
     return parser.parse_args()
 
 
@@ -26,7 +29,7 @@ def reconstruct(sess, model, samples):
     return x_sample, model.run(sess, x_sample)
 
 
-def plot(sample, reconstruction, config_name, save=False):
+def plot(sample, reconstruction, config_name, result_path=None):
     plt.figure(figsize=(8, 12))
     for i in range(5):
         plt.subplot(5, 2, 2 * i + 1)
@@ -38,28 +41,32 @@ def plot(sample, reconstruction, config_name, save=False):
         plt.title("Reconstruction")
         plt.colorbar()
     plt.tight_layout()
-    if save:
-        results_dir = RESULT_DIR / config_name
+    if result_path is not None:
+        results_dir = RESULT_ROOT / config_name
         if not results_dir.exists():
             results_dir.mkdir()
-        filepath = '%s/%s' % (str(results_dir), '/reconstruction.png')
+        filepath = '%s/%s' % (str(result_path), '/reconstruction.png')
         plt.savefig(filepath)
     else:
         plt.show()
 
 
 if __name__ == '__main__':
-    args = parse_args()
-    if not args.config or not args.vae_checkpoint_file:
-        raise ValueError('config or checkpoint file missing')
+    FLAGS = parse_args()
 
-    architecture = config[args.config]
-    checkpoint_path = build_checkpoint_path(args.config, args.vae_checkpoint_file)
+    checkpoint_path = build_checkpoint_path(FLAGS.vae_model, FLAGS.latent_dim, FLAGS.hidden_size,
+                                            FLAGS.layers, FLAGS.ckpt_num)
+    results_path = build_results_path(FLAGS.vae_model, FLAGS.latent_dim, FLAGS.hidden_size,
+                                            FLAGS.layers, FLAGS.ckpt_num)
 
-    dataset = input_data.read_data_sets('MNIST_data', one_hot=True)
+    dataset = input_data.read_data_sets(FLAGS.data_dir, one_hot=True)
+    model_class = Vae
+    if FLAGS.vae_model == 'mmd':
+        model_class = MmdVae
     with tf.Session() as session:
-        vae = Vae(architecture)
-        vae.restore(session, checkpoint_path)
+        vae = model_class(FLAGS.latent_dim, FLAGS.hidden_size, FLAGS.layers)
+        saver = tf.train.Saver()
+        saver.restore(session, checkpoint_path)
 
         inputs, outputs = reconstruct(session, vae, dataset)
-        plot(inputs, outputs, args.config, args.save_plot)
+        plot(inputs, outputs, FLAGS.vae_model, results_path)

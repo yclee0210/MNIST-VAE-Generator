@@ -1,2 +1,0 @@
-model_checkpoint_path: "/Users/yclee/Documents/UW-F18/CS760/music-gan/src/checkpoints/mnist_vae_2d/model.ckpt"
-all_model_checkpoint_paths: "/Users/yclee/Documents/UW-F18/CS760/music-gan/src/checkpoints/mnist_vae_2d/model.ckpt"
