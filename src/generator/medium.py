@@ -94,6 +94,8 @@ class MediumGenerator(object):
         # Medium-2
         self.set_distributions(encodings, labels)
         opt_score = 1e10 * np.ones(10)
+        opt_acc = np.zeros(10)
+        opt_cos = np.ones(10)
         opt_val = np.empty((10, 10))
 
         vals = [0., 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.]
@@ -113,12 +115,19 @@ class MediumGenerator(object):
                 score = cos_sim + 1e1 * (1 - acc)
                 if score < opt_score[y]:
                     opt_score[y] = score
+                    opt_cos[y] = cos_sim
+                    opt_acc[y] = acc
                     opt_val[y, :] = eps_stdevs
+                    for y in range(results.shape[0]):
+                        print(y, eps_stdevs, '%.16f' % (opt_score[y]))
+                    print(np.mean(opt_score), np.mean(opt_cos), np.mean(opt_acc))
+                    print(time.time())
 
-            if i % 1000000 == 0:
+            if i % 100000 == 0:
                 print('%d/%d' % (i, iterations))
                 for y in range(results.shape[0]):
                     print(y, eps_stdevs, '%.16f' % (opt_score[y]))
+                print(np.mean(opt_score), np.mean(opt_cos), np.mean(opt_acc))
                 print(time.time())
 
         return opt_score, opt_val
