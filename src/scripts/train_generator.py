@@ -76,11 +76,27 @@ def train(dataset):
             for i in range(tables.shape[0]):
                 print(tables[i, :, :])
                 np.savetxt('%s/simple_%d' % (result_path, sampling[i]), tables[i, :, :])
-        else:
+        elif FLAGS.gen_model == 'medium1':
             cost, vals = gen_model.train(sess, encodings, labels, classifier)
             print(cost)
             print(vals)
             np.savetxt('%s/medium' % result_path, vals)
+        else:
+            cost, vals = gen_model.train2(sess, encodings, labels, classifier)
+            print(cost)
+            print(vals)
+            np.savetxt('%s/medium' % result_path, vals)
+            # [0.  0.  0.  0.  0.  0.  0.2 0.3 0.3 0.9]
+            # 0.8624786180257797 0.9989999999999999 0.8724786180257809
+            # [0.  0.  0.  0.  0.  0.2 0.2 0.3 0.3 1. ]
+            # 0.8612541016936301 0.9989999999999999 0.8712541016936313
+            # [0.  0.  0.  0.  0.1 0.1 0.4 0.4 0.4 1. ]
+            # 0.8168011233210564 0.9959999999999999 0.8568011233210575
+            # [0.  0.  0.1 0.1 0.3 0.3 0.3 0.3 0.3 1. ]
+            # 0.8434233599901200 0.9989999999999999 0.8534233599901211
+            # [0.  0.  0.2 0.2 0.4 0.4 0.4 0.4 0.4 0.8]
+            # 0.8132053801417352 0.9979999999999999 0.8332053801417363
+
 
 
 

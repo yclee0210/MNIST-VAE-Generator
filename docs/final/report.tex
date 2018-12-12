@@ -130,10 +130,10 @@ where $cos(x,x')$ denotes the cosine similarity
 over the range $0 \le \theta \le 1$ with step size 0.1, and $n \in \{1,2,3,5\}$.
 
 \subsubsection{Medium\-1}
-Our second approach enhances the ability to fine tune the distributions by treating $\theta$ as a vector of dimension equal to the latent space. In our algorithm we perform a grid search over the $\theta_d$ values from 0 to 1 in step sizes of 0.1. The interpretation for this fine tuning can be thought as modulating the effect of each dimension in the latent space over the entire dataset.
+Our second approach enhances the ability to fine tune the distributions by treating $\theta$ as a vector of dimension equal to the latent space. In our algorithm we perform a prioritized grid search over the $\theta_d$ values from 0 to 1 in step sizes of 0.1. The interpretation for this fine tuning can be thought as modulating the effect of each dimension in the latent space over the entire dataset. Empirical evidences from our preliminary search suggested that the last dimension in the latent space is low in relevance to improving accuracy, but provide high variance. With this in mind, our search prioritizes search for combination of lower values for the first 9 dimensions, leaving the last dimension free.
 
 \subsubsection{Medium\-2}
-Lastly, we further enhance the ability to fine tune the distributions by treating $\theta$ as a 2D array of D x L where D is the dimension of the latent space and L is the number of classes. As with Medium-1, we perform a grid search over the possible range. This approach has advantage over Medium-1 of being able to pinpoint each of the label distributions, whilst adding little computational overhead.
+Lastly, we further enhance the ability to fine tune the distributions by treating $\theta$ as a 2D array of D x L where D is the dimension of the latent space and L is the number of classes. As with Medium-1, we perform a grid search over the possible range, testing optimality for each label. This approach has advantage over Medium-1 of being able to further pinpoint each of the label distributions, whilst adding little computational overhead.
 \section{Experiments}
 \subsection{Dataset}
 
@@ -204,7 +204,7 @@ Figure 1 shows the performance averaged across labels (Accuracy vs. Cosine Simil
 
 \subsubsection{Objective function score comparison and sample generations}
 
-By progressively allowing for finer tuning of the $\theta$ hyper-parameter, we find that greater sample variance can be achieved whilst maintaining a high ($>99\%$) accuracy. We partially trained our Medium1 generator using latent space dimension 10 and mmd model. Even at 0.01\% completion, we discovered optimizing $\theta$ vector above the Cosine-Accuracy curve presented on Figure 1. Table 4 summarizes our results. \par
+By progressively allowing for finer tuning of the $\theta$ hyper-parameter, we find that greater sample variance can be achieved whilst maintaining a high ($>99\%$) accuracy. We partially trained our Medium1 and Medium2 generator using latent space dimension 10 and mmd model. Even at 0.01\% completion, we discovered optimizing $\theta$ vector above the Cosine-Accuracy curve presented on Figure 1. Table 4 summarizes our results. \par
 
 \begin{table}[h]
   \caption{$\theta$ and $n$ Parameters (*partial results)}
@@ -216,24 +216,29 @@ By progressively allowing for finer tuning of the $\theta$ hyper-parameter, we f
     \midrule
     ELBO-20 & Simple  & 0.4 / 2 & 0.9200 & 0.995 \\
     MMD-20 & Simple &  0.6 / 3  & 0.8870 & 0.9968 \\
-    MMD-10 & Medium-1 & [0.  0.  0.  0.  0.1 0.1 0.4 0.4 0.4 1.]* & 0.8168 & 0.9960 \\
+    MMD-10 & Medium-1 & [0.  0.  0.2 0.2 0.4 0.4 0.4 0.4 0.4 0.8]* & 0.8132 & 0.9980 \\
+    MMD-10 & Medium-2 & - & 0.7461 & 0.9999 \\
     \bottomrule
   \end{tabular}
 \end{table}
 
-Finally, for each of the 3 optimized configurations, we demonstrate the respective generators' ability to conditionally generate samples on Figures 2-4. In particular, using the Medium-1 generator allows us to obtain comparable picture quality even at half the dimension size of the Simple generated samples, and the samples exhibited show greater variety.
+Finally, for each of the 3 optimized configurations, we demonstrate the respective generators' ability to conditionally generate samples on Figures 2-4. In particular, using the Medium-1/2 generators allows us to obtain comparable picture quality even at half the dimension size of the Simple generated samples, and the samples exhibited show greater variety.
 \begin{figure}[htb]
-\minipage{0.32\textwidth}
+\minipage{0.49\textwidth}
   \includegraphics[width=\linewidth]{assets/elbo_20_simple.png}
   \caption{ELBO-VAE / Latent-Dim=20 / Simple Gen}\label{fig:elbo_20_simple}
 \endminipage\hfill
-\minipage{0.32\textwidth}
+\minipage{0.49\textwidth}
    \includegraphics[width=\linewidth]{assets/mmd_20_simple.png}
   \caption{MMD-VAE / Latent-Dim=20 / Simple Gen}\label{fig:mmd_20_simple}
 \endminipage\hfill
-\minipage{0.32\textwidth}%
+\minipage{0.49\textwidth}%
    \includegraphics[width=\linewidth]{assets/mmd_10_medium.png}
   \caption{MMD-VAE / Latent-Dim=10 / Medium1 Gen}\label{fig:mmd_10_medium}
+\endminipage\hfill
+\minipage{0.49\textwidth}
+   \includegraphics[width=\linewidth]{assets/mmd_10_medium2.png}
+  \caption{MMD-VAE / Latent-Dim=10 / Medium2 Gen}\label{fig:mmd_20_simple}
 \endminipage
 \end{figure}
 \section{Related Works}
@@ -247,7 +252,7 @@ The disentangled latent variables represented by $z=[x_F, x_B]$ can be combined 
 
 \subsection{MusicVAE}
 
-MusicVAE is a project by Google's Magenta research team to create a variational autoencoder for music (Roberts et al., 2018). Although VAE models have been shown to be effective models for producing semantically meaningful representations of natural data, especially as it pertains to images, not much work had been done to bring these advances to music effectively. Since music derives its meaning from sequences of long term structures, MusicVAE addresses this issue by using a hierarchical decoder that is based on existing architectures for recurrent VAE models. Additionally, MusicVAE explores the space between different musical sequences using interpolation between latent vectors to generate novel examples that exist in latent space between two example musical pieces given as inputs. Furthermore, MusicVAE explores the identification of ?attribute vectors?. These vectors aim to codify different features inherent in the music analyzed and which allow one to use arithmetic to add or subtract those features, with some success, from a given musical sequence. By analyzing the structure of musical sequences via latent representations, MusicVAE paves way for understanding the distinguishing properties of different genres and themes.
+MusicVAE is a project by Google's Magenta research team to create a variational autoencoder for music (Roberts et al., 2018). Although VAE models have been shown to be effective models for producing semantically meaningful representations of natural data, especially as it pertains to images, not much work had been done to bring these advances to music effectively. Since music derives its meaning from sequences of long term structures, MusicVAE addresses this issue by using a hierarchical decoder that is based on existing architectures for recurrent VAE models. Additionally, MusicVAE explores the space between different musical sequences using interpolation between latent vectors to generate novel examples that exist in latent space between two example musical pieces given as inputs. Furthermore, MusicVAE explores the identification of 'attribute vectors'. These vectors aim to codify different features inherent in the music analyzed and which allow one to use arithmetic to add or subtract those features, with some success, from a given musical sequence. By analyzing the structure of musical sequences via latent representations, MusicVAE paves way for understanding the distinguishing properties of different genres and themes.
 
 \subsection{Generative Adversarial Networks}
 
@@ -256,7 +261,7 @@ In this process the GAN aims to maximize/minimize the binary cross entropy of th
 \begin{equation} 
 L_{GAN}=\log(Dis(x))+\log(1-Dis(Gen(z)))
 \end{equation}
-Where x is a real example from data space and z is a random latent vector fed as input into the Generator. The generator is ultimately trying to learn p(z). The discriminator assigns probability y = Dis(x)  to the event that x is a real training sample and 1 - y to the probability that the input x was generated by Gen. Extensions on existing work on GANs like ConditionalGAN explore ways in which GANs can be trained to conditionally generate examples depending on the desired feature values. (Mirza et al. 2014). Whilst GAN-based conditional generators have advantage over our proposed method in generating a more diverse, high fidelity generations, they also require much heavier computing resources, and in simpler problem settings, we argue that our method is robust enough to fit the needs.
+Where x is a real example from data space and z is a random latent vector fed as input into the Generator. The generator is ultimately trying to learn p(z). The discriminator assigns probability y = Dis(x)  to the event that x is a real training sample and 1 - y to the probability that the input x was generated by Gen. Extensions on existing work on GANs like ConditionalGAN explore ways in which GANs can be trained to conditionally generate examples depending on the desired feature values \cite{Mirza}. Whilst GAN-based conditional generators have advantage over our proposed method in generating a more diverse, high fidelity generations, they also require much heavier computing resources, and in simpler problem settings, we argue that our method is robust enough to fit the needs.
 
 \section{Conclusion}
 
@@ -272,20 +277,6 @@ size to \verb+small+ (9 point) when listing the references. {\bf
   additional pages contain \emph{only} cited references.}
 \medskip
 
-\small
-
-[1] Alexander, J.A.\ \& Mozer, M.C.\ (1995) Template-based algorithms
-for connectionist rule extraction. In G.\ Tesauro, D.S.\ Touretzky and
-T.K.\ Leen (eds.), {\it Advances in Neural Information Processing
-  Systems 7}, pp.\ 609--616. Cambridge, MA: MIT Press.
-
-[2] Bower, J.M.\ \& Beeman, D.\ (1995) {\it The Book of GENESIS:
-  Exploring Realistic Neural Models with the GEneral NEural SImulation
-  System.}  New York: TELOS/Springer--Verlag.
-
-[3] Hasselmo, M.E., Schnell, E.\ \& Barkai, E.\ (1995) Dynamics of
-learning and recall at excitatory recurrent synapses and cholinergic
-modulation in rat hippocampal region CA3. {\it Journal of
-  Neuroscience} {\bf 15}(7):5249-5262.
-
+\bibliography{bibl}
+\bibliographystyle{plain}
 \end{document}

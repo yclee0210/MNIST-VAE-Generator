@@ -37,6 +37,20 @@ class MediumGenerator(object):
             # np.save(save_to / 'imgs', imgs)
         return results
 
+    def generate2(self, sess, stdevs, sampling=2):
+        results = np.empty((self.distributions.shape[0], self.batch_size, 28, 28),
+                           dtype=np.float32)
+        for y in range(self.distributions.shape[0]):
+            # save_to = save_path / ('label_%d' % y)
+            # if not save_to.exists():
+            # save_to.mkdir()
+            stdevs_y = stdevs[y, :]
+            dist = self.distributions[y]
+            imgs = self.generate_batches(sess, dist, stdevs_y, sampling)
+            results[y, :, :, :] = imgs
+            # np.save(save_to / 'imgs', imgs)
+        return results
+
     def set_distributions(self, encodings, labels):
         self.distributions = np.ndarray((labels.shape[1], encodings.shape[1], 2))
         for y in range(labels.shape[1]):
@@ -98,36 +112,35 @@ class MediumGenerator(object):
         opt_cos = np.ones(10)
         opt_val = np.empty((10, 10))
 
-        vals = [0., 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.]
-        combinations = itertools.combinations_with_replacement(vals, 10)
-        iterations = 10 ** 11
-        i = 0
-        for combination in combinations:
-            eps_stdevs = np.array(combination)
-            results = self.generate(sess, eps_stdevs, 1)
-            for y in range(results.shape[0]):
-                lab_results = results[y, :, :, :].reshape(-1, 784)
-                lab_labels = np.zeros((lab_results.shape[0], results.shape[0]))
-                lab_labels[:, y] = 1.
-                cos_sim = self.cos_sim(lab_results, sampling=10)
-                _, acc = classifier.evaluate(lab_results.reshape(-1, 28, 28, 1), lab_labels,
-                                             verbose=0)
-                score = cos_sim + 1e1 * (1 - acc)
-                if score < opt_score[y]:
-                    opt_score[y] = score
-                    opt_cos[y] = cos_sim
-                    opt_acc[y] = acc
-                    opt_val[y, :] = eps_stdevs
-                    for y in range(results.shape[0]):
-                        print(y, eps_stdevs, '%.16f' % (opt_score[y]))
-                    print(np.mean(opt_score), np.mean(opt_cos), np.mean(opt_acc))
-                    print(time.time())
-
-            if i % 100000 == 0:
-                print('%d/%d' % (i, iterations))
-                for y in range(results.shape[0]):
-                    print(y, eps_stdevs, '%.16f' % (opt_score[y]))
-                print(np.mean(opt_score), np.mean(opt_cos), np.mean(opt_acc))
-                print(time.time())
+        vals = [0., 0.1, 0.2, 0.3]
+        for val in [0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.]:
+            vals.append(val)
+            combinations = itertools.combinations_with_replacement(vals, 9)
+            for combination in combinations:
+                if val in combination:
+                    for val_last in [0., 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.]:
+                        eps_stdevs = np.array(combination + tuple((val_last,)))
+                        results = self.generate(sess, eps_stdevs, 1)
+                        for y in range(results.shape[0]):
+                            lab_results = results[y, :, :, :].reshape(-1, 784)
+                            lab_labels = np.zeros((lab_results.shape[0], results.shape[0]))
+                            lab_labels[:, y] = 1.
+                            cos_sim = self.cos_sim(lab_results, sampling=10)
+                            _, acc = classifier.evaluate(lab_results.reshape(-1, 28, 28, 1), lab_labels,
+                                                         verbose=0)
+                            score = cos_sim + 1e1 * (1 - acc)
+                            if score < opt_score[y]:
+                                opt_score[y] = score
+                                opt_cos[y] = cos_sim
+                                opt_acc[y] = acc
+                                opt_val[y, :] = eps_stdevs
+                                for y in range(results.shape[0]):
+                                    print(y, opt_val[y], '%.16f' % (opt_score[y]))
+                                print(np.mean(opt_score), np.mean(opt_cos), np.mean(opt_acc))
+                                print(time.time())
+            for y in range(10):
+                print(y, opt_val[y], '%.16f' % (opt_score[y]))
+            print(np.mean(opt_score), np.mean(opt_cos), np.mean(opt_acc))
+            print(time.time())
 
         return opt_score, opt_val
