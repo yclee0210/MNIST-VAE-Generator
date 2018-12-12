@@ -1,8 +1,40 @@
 \begin{thebibliography}{1}
 
+\bibitem{Kingma}
+Diederik~P Kingma and Max Welling.
+\newblock Auto-encoding variational bayes, 2013.
+
+\bibitem{Ranzato}
+Marc'Aurelio Ranzato ; Fu Jie Huang ; Y-Lan Boureau ;~Yann LeCun.
+\newblock Unsupervised learning of invariant feature hierarchies with
+  applications to object recognition.
+\newblock {\em IEEE Conference on Computer Vision and Pattern Recognition},
+  2007.
+
 \bibitem{Mirza}
 Mehdi Mirza, Ian~J. Goodfellow, Jean Pouget-Abadie, Bing Xu, David
   Warde-Farley, Sherjil Ozair, Aaron Courville, and Yoshua Bengio.
 \newblock Generative adversarial networks, 2014.
+
+\bibitem{Roberts}
+Adam Roberts, Jesse Engel, Colin Raffel, Curtis Hawthorne, and Douglas Eck.
+\newblock A hierarchical latent vector model for learning long-term structure
+  in music.
+\newblock 2018.
+
+\bibitem{LeCun}
+Y.~Bengio Y.~LeCun, L.~Bottou and P.~Haffner.
+\newblock Gradient-based learning applied to document recognition.
+\newblock {\em Proceedings of the IEEE}, 1998.
+
+\bibitem{Yan}
+Xinchen Yan, Jimei Yang, Kihyuk Sohn, and Honglak Lee.
+\newblock Attribute2image: Conditional image generation from visual attributes,
+  2015.
+
+\bibitem{zhao2017infovae}
+Shengjia Zhao, Jiaming Song, and Stefano Ermon.
+\newblock Infovae: Information maximizing variational autoencoders.
+\newblock {\em arXiv preprint arXiv:1706.02262}, 2017.
 
 \end{thebibliography}
