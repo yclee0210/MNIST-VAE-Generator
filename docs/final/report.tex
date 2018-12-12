@@ -28,7 +28,7 @@
 \usepackage{amsmath}
 \usepackage{graphicx}
 
-\title{Categorical generation of images via analysis of learned latent vectors}
+\title{Statistical generation of hand-written digits via analysis of learned latent representations}
 
 % The \author macro works with any number of authors. There are two
 % commands used to separate the names and addresses of multiple
@@ -265,7 +265,7 @@ Where x is a real example from data space and z is a random latent vector fed as
 
 \section{Conclusion}
 
-\textbf{TODO}
+In this paper we have shown that, by relatively simple analysis of the label-specific distributions in latent space, it is possible to construct a statistical generator capable of generating artificial samples of specific type whilst maintaining variance of the samples generated. Whilst our results are preliminary, our work presents an alternative to generators based on complex neural network models, have added advantage of being consisted of self-contained replaceable components, allowing us to replace each component with state-of-the-art alternatives. In the future, a possible extension would be to improve the generator component using Bayes net to further exploit relationship between distributions of each feature in the latent space, and/or use further heuristics to improve training velocity.
 
 \medskip
 
