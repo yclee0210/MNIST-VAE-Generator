@@ -17,6 +17,8 @@
 \providecommand\HyField@AuxAddToFields[1]{}
 \providecommand\HyField@AuxAddToCoFields[2]{}
 \citation{Yan}
+\citation{Kingma2}
+\providecommand \oddpage@label [2]{}
 \@writefile{toc}{\contentsline {section}{\numberline {1}Introduction}{1}{section.1}}
 \citation{Kingma,Ranzato,Roberts,Yan,zhao2017infovae}
 \citation{zhao2017infovae}
@@ -28,33 +30,30 @@
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Motivation}{2}{subsection.3.1}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Overview}{2}{subsection.3.2}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.3}VAE Training}{2}{subsection.3.3}}
-\citation{LeCun}
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.4}Classifier}{3}{subsection.3.4}}
+\@writefile{loa}{\contentsline {algocf}{\numberline {1}{\ignorespaces General $\theta $,$n$ search algorithm for Simple/Medium-1/Medium-2 generators}}{3}{algocf.1}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.5}Generator}{3}{subsection.3.5}}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {3.5.1}Simple}{3}{subsubsection.3.5.1}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.5.2}Medium\-1}{3}{subsubsection.3.5.2}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.5.3}Medium\-2}{3}{subsubsection.3.5.3}}
-\@writefile{toc}{\contentsline {section}{\numberline {4}Experiments}{3}{section.4}}
-\newlabel{sec:experiments}{{4}{3}{Experiments}{section.4}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Dataset}{3}{subsection.4.1}}
+\citation{LeCun}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.5.2}Medium\-1}{4}{subsubsection.3.5.2}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.5.3}Medium\-2}{4}{subsubsection.3.5.3}}
+\@writefile{toc}{\contentsline {section}{\numberline {4}Experiments}{4}{section.4}}
+\newlabel{sec:experiments}{{4}{4}{Experiments}{section.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Dataset}{4}{subsection.4.1}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Training Details}{4}{subsection.4.2}}
 \@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Encoder}}{4}{table.1}}
 \newlabel{encoder}{{1}{4}{Encoder}{table.1}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Decoder}}{4}{table.2}}
-\newlabel{decoder}{{2}{4}{Decoder}{table.2}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces Classifier}}{4}{table.3}}
-\newlabel{classifier}{{3}{4}{Classifier}{table.3}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.3}Results}{4}{subsection.4.3}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.3.1}Cosine Similarity vs Classification Accuracy}{4}{subsubsection.4.3.1}}
-\citation{Yan}
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Decoder}}{5}{table.2}}
+\newlabel{decoder}{{2}{5}{Decoder}{table.2}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces Classifier}}{5}{table.3}}
+\newlabel{classifier}{{3}{5}{Classifier}{table.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.3}Results}{5}{subsection.4.3}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.3.1}Cosine Similarity vs Classification Accuracy}{5}{subsubsection.4.3.1}}
 \@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces accuracy vs. cosine similarity for VAE and MMD-VAE based generators at D=20}}{5}{figure.1}}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {4.3.2}Objective function score comparison and sample generations}{5}{subsubsection.4.3.2}}
-\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces $\theta $ and $n$ Parameters (*partial results)}}{5}{table.4}}
-\newlabel{theta}{{4}{5}{$\theta $ and $n$ Parameters (*partial results)}{table.4}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {5}Related Works}{5}{section.5}}
-\newlabel{sec:related}{{5}{5}{Related Works}{section.5}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Attribute2Image}{5}{subsection.5.1}}
-\citation{Mirza}
+\citation{Yan}
+\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces $\theta $ and $n$ Parameters (*partial results)}}{6}{table.4}}
+\newlabel{theta}{{4}{6}{$\theta $ and $n$ Parameters (*partial results)}{table.4}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces ELBO-VAE / Latent-Dim=20 / Simple Gen}}{6}{figure.2}}
 \newlabel{fig:elbo_20_simple}{{2}{6}{ELBO-VAE / Latent-Dim=20 / Simple Gen}{figure.2}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces MMD-VAE / Latent-Dim=20 / Simple Gen}}{6}{figure.3}}
@@ -63,17 +62,23 @@
 \newlabel{fig:mmd_10_medium}{{4}{6}{MMD-VAE / Latent-Dim=10 / Medium1 Gen}{figure.4}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces MMD-VAE / Latent-Dim=10 / Medium2 Gen}}{6}{figure.5}}
 \newlabel{fig:mmd_20_simple}{{5}{6}{MMD-VAE / Latent-Dim=10 / Medium2 Gen}{figure.5}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}MusicVAE}{6}{subsection.5.2}}
+\citation{Roberts}
 \citation{Mirza}
-\bibdata{bibl}
-\bibcite{Kingma}{{1}{}{{}}{{}}}
-\bibcite{Ranzato}{{2}{}{{}}{{}}}
-\bibcite{Mirza}{{3}{}{{}}{{}}}
-\bibcite{Roberts}{{4}{}{{}}{{}}}
-\bibcite{LeCun}{{5}{}{{}}{{}}}
-\bibcite{Yan}{{6}{}{{}}{{}}}
-\bibcite{zhao2017infovae}{{7}{}{{}}{{}}}
-\bibstyle{plain}
-\providecommand\NAT@force@numbers{}\NAT@force@numbers
+\citation{Mirza}
+\@writefile{toc}{\contentsline {section}{\numberline {5}Related Works}{7}{section.5}}
+\newlabel{sec:related}{{5}{7}{Related Works}{section.5}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Attribute2Image}{7}{subsection.5.1}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}MusicVAE}{7}{subsection.5.2}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {5.3}Generative Adversarial Networks}{7}{subsection.5.3}}
 \@writefile{toc}{\contentsline {section}{\numberline {6}Conclusion}{7}{section.6}}
+\bibdata{bibl}
+\bibcite{Kingma2}{{1}{}{{}}{{}}}
+\bibcite{Kingma}{{2}{}{{}}{{}}}
+\bibcite{Ranzato}{{3}{}{{}}{{}}}
+\bibcite{LeCun}{{4}{}{{}}{{}}}
+\bibcite{Mirza}{{5}{}{{}}{{}}}
+\bibcite{Roberts}{{6}{}{{}}{{}}}
+\bibcite{Yan}{{7}{}{{}}{{}}}
+\bibcite{zhao2017infovae}{{8}{}{{}}{{}}}
+\bibstyle{plain}
+\providecommand\NAT@force@numbers{}\NAT@force@numbers

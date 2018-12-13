@@ -27,6 +27,7 @@
 \usepackage{microtype}      % microtypography
 \usepackage{amsmath}
 \usepackage{graphicx}
+\usepackage[linesnumbered,ruled]{algorithm2e}
 
 \title{Statistical generation of hand-written digits via analysis of learned latent representations}
 
@@ -80,7 +81,7 @@ In this work, we address the problem of conditional generation. We will describe
 
 A variational autoencoder (VAE) consists of two networks, encoder and decoder. The encoder
 takes in samples in the domain of interest, and outputs a distribution in a lower dimensional
-latent space (Kingma, 2014). The decoder samples from this distribution and decodes the latent representation
+latent space \cite{Kingma2}. The decoder samples from this distribution and decodes the latent representation
 back into data space. Specifically, the latent representation z is a sample from the Gaussian
 probability density defined by the output of the encoder $q_\theta(\mathbf{z}|\mathbf{x})$, and
 the final output of the VAE is a reconstruction $p_\theta(\mathbf{x}|\mathbf{z})$ of the original input 
@@ -113,6 +114,43 @@ where k(z, z') is a Gaussian kernel. MMD measures the similarity of the latent v
 \subsection{Classifier}
 
 As the classifier is not part of the generator setup, the classifier can be any blackbox categorical classifier capable of distinguishing the input domain with high accuracy. In our case, as the purpose of our classifier is to measure the class generation accuracy of our generator, we train our classifier using the reconstructed train set. We select and use an existing classifier capable of achieving >0.97 accuracy on the training set samples.
+
+\begin{algorithm}
+    \SetKwInOut{Input}{Input}
+    \SetKwInOut{Output}{Output}
+
+    \underline{\textbf{method} Generator.train} $(\mathcal{E}, \mathcal{D}, \mathcal{C}, X, Y)$\;
+    \Input{Pre-trained decoder $\mathcal{D}$, classifier $\mathcal{C}$, training set X and matching labels Y}
+    \Output{Optimal parameters $\theta, n$}
+    encoded = $\mathcal{E}$.encode(X)\;
+    reconstructed = $\mathcal{D}$.decode(encoded)\;
+    $\mathcal{C}$.train(reconstructed, Y)\;
+    \For{$y \in Labels(Y)$} {
+    	$\mu_y, \sigma_y = getDistribution(\{z | z \in encoded \wedge label(z)= y\})$\;
+    }
+    optScore = Inf\;
+    opt$\theta$ = None\;
+    optSampling = 1\;
+    \For{$\{(\theta, n) | \theta \in [0, 1]^d \wedge n \in \{1, 2, 3, 5\}\}$, prioritized using heuristics}{
+    	samples = $\emptyset$\;
+	\For{$y \in Labels(Y)$} {
+    		\While{samples.size < 1000}{
+			distribution = $N(\mu, \theta\sigma)$ \;
+			z = mean(sample(distribution) $n$ times)\;
+			samples = samples$ \cup \{((z, y)\}$
+		}
+    	}
+    	images = $\mathcal{D}.decode(\{z | (z, y) \in $ samples$\})$\;
+	score = $meanCosSim(images) + (1 - \mathcal{C}.evaluate(images, \{y | (z, y) \in $ samples$\}).accuracy)$\;
+	\If{score < optScore}{
+		optScore = score\;
+	    	opt$\theta$ = $\theta$\;
+    		optSampling = n\;
+	}
+    }
+    \Return{$\theta, n$}
+    \caption{General $\theta$,$n$ search algorithm for Simple/Medium-1/Medium-2 generators}
+\end{algorithm}
 
 \subsection{Generator}
 In this paper, we present three different mechanisms by which we can use the trained VAE to learn the conditional distributions of each label class in the latent space, and present results of the first two.
@@ -220,7 +258,7 @@ By progressively allowing for finer tuning of the $\theta$ hyper-parameter, we f
     ELBO-20 & Simple  & 0.4 / 2 & 0.9200 & 0.995 \\
     MMD-20 & Simple &  0.6 / 3  & 0.8870 & 0.9968 \\
     MMD-10 & Medium-1 & [0.  0.  0.2 0.2 0.4 0.4 0.4 0.4 0.4 0.8]* & 0.8132 & 0.9980 \\
-    MMD-10 & Medium-2 & - & 0.7461 & 0.9999 \\
+    MMD-10 & Medium-2 & Not shown & 0.7075 & 0.9999 \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -256,7 +294,7 @@ The disentangled latent variables represented by $z=[x_F, x_B]$ can be combined 
 
 \subsection{MusicVAE}
 
-MusicVAE is a project by Google's Magenta research team to create a variational autoencoder for music (Roberts et al., 2018). Although VAE models have been shown to be effective models for producing semantically meaningful representations of natural data, especially as it pertains to images, not much work had been done to bring these advances to music effectively. Since music derives its meaning from sequences of long term structures, MusicVAE addresses this issue by using a hierarchical decoder that is based on existing architectures for recurrent VAE models. Additionally, MusicVAE explores the space between different musical sequences using interpolation between latent vectors to generate novel examples that exist in latent space between two example musical pieces given as inputs. Furthermore, MusicVAE explores the identification of 'attribute vectors'. These vectors aim to codify different features inherent in the music analyzed and which allow one to use arithmetic to add or subtract those features, with some success, from a given musical sequence. By analyzing the structure of musical sequences via latent representations, MusicVAE paves way for understanding the distinguishing properties of different genres and themes.
+MusicVAE is a project by Google's Magenta research team to create a variational autoencoder for music \cite{Roberts}. Although VAE models have been shown to be effective models for producing semantically meaningful representations of natural data, especially as it pertains to images, not much work had been done to bring these advances to music effectively. Since music derives its meaning from sequences of long term structures, MusicVAE addresses this issue by using a hierarchical decoder that is based on existing architectures for recurrent VAE models. Additionally, MusicVAE explores the space between different musical sequences using interpolation between latent vectors to generate novel examples that exist in latent space between two example musical pieces given as inputs. Furthermore, MusicVAE explores the identification of 'attribute vectors'. These vectors aim to codify different features inherent in the music analyzed and which allow one to use arithmetic to add or subtract those features, with some success, from a given musical sequence. By analyzing the structure of musical sequences via latent representations, MusicVAE paves way for understanding the distinguishing properties of different genres and themes.
 
 \subsection{Generative Adversarial Networks}
 

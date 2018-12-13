@@ -1,5 +1,10 @@
 \begin{thebibliography}{1}
 
+\bibitem{Kingma2}
+Diederik~P. Kingma, Danilo~Jimenez Rezende, Shakir Mohamed, and Max Welling.
+\newblock Semi-supervised learning with deep generative models.
+\newblock {\em CoRR}, abs/1406.5298, 2014.
+
 \bibitem{Kingma}
 Diederik~P Kingma and Max Welling.
 \newblock Auto-encoding variational bayes, 2013.
@@ -11,6 +16,11 @@ Marc'Aurelio Ranzato ; Fu Jie Huang ; Y-Lan Boureau ;~Yann LeCun.
 \newblock {\em IEEE Conference on Computer Vision and Pattern Recognition},
   2007.
 
+\bibitem{LeCun}
+Yann LeCun, L{\'e}on Bottou, Yoshua Bengio, and Patrick Haffner.
+\newblock Gradient-based learning applied to document recognition.
+\newblock {\em Proceedings of the IEEE}, 86(11):2278--2324, 1998.
+
 \bibitem{Mirza}
 Mehdi Mirza, Ian~J. Goodfellow, Jean Pouget-Abadie, Bing Xu, David
   Warde-Farley, Sherjil Ozair, Aaron Courville, and Yoshua Bengio.
@@ -20,12 +30,7 @@ Mehdi Mirza, Ian~J. Goodfellow, Jean Pouget-Abadie, Bing Xu, David
 Adam Roberts, Jesse Engel, Colin Raffel, Curtis Hawthorne, and Douglas Eck.
 \newblock A hierarchical latent vector model for learning long-term structure
   in music.
-\newblock 2018.
-
-\bibitem{LeCun}
-Y.~Bengio Y.~LeCun, L.~Bottou and P.~Haffner.
-\newblock Gradient-based learning applied to document recognition.
-\newblock {\em Proceedings of the IEEE}, 1998.
+\newblock {\em CoRR}, abs/1803.05428, 2018.
 
 \bibitem{Yan}
 Xinchen Yan, Jimei Yang, Kihyuk Sohn, and Honglak Lee.
